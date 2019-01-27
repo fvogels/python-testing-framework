@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from scripting.assertions import AssertionFailure
 from scripting.dynamic import create_dynamic_variable, dynamic_bind, dynamic_append
 
@@ -8,7 +8,6 @@ __fail_observers = create_dynamic_variable()
 __skip_predicate = create_dynamic_variable()
 
 
-
 @contextmanager
 def initialize_testing_environment():
     with dynamic_bind(__pass_observers, []), dynamic_bind(__skip_observers, []), dynamic_bind(__fail_observers, []), dynamic_bind(__skip_predicate, lambda: False):
@@ -16,14 +15,14 @@ def initialize_testing_environment():
 
 @contextmanager
 def observers(on_pass=None, on_fail=None, on_skip=None):
-    def do_nothing():
-        pass
+    with ExitStack() as stack:
+        if on_pass:
+            stack.enter_context(dynamic_append(__pass_observers, on_pass))
+        if on_fail:
+            stack.enter_context(dynamic_append(__fail_observers, on_fail))
+        if on_skip:
+            stack.enter_context(dynamic_append(__skip_observers, on_skip))
 
-    on_pass = on_pass or do_nothing
-    on_fail = on_fail or do_nothing
-    on_skip = on_skip or do_nothing
-
-    with dynamic_append(__pass_observers, on_pass), dynamic_append(__fail_observers, on_fail), dynamic_append(__skip_observers, on_skip):
         yield
 
 @contextmanager
@@ -74,7 +73,7 @@ def __test_passed():
     Called whenever a test passes.
     Notifies pass-observers.
     '''
-    for observer in __pass_observers.value:
+    for observer in reversed(__pass_observers.value):
         observer()
 
 
@@ -83,7 +82,7 @@ def __test_failed():
     Called whenever a test fails.
     Notifies fail-observers.
     '''
-    for observer in __fail_observers.value:
+    for observer in reversed(__fail_observers.value):
         observer()
 
 
@@ -92,7 +91,7 @@ def __test_skipped():
     Called whenever a test is skipped.
     Notifies skip-observers.
     '''
-    for observer in __skip_observers.value:
+    for observer in reversed(__skip_observers.value):
         observer()
 
 

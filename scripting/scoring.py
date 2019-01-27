@@ -1,4 +1,4 @@
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from scripting.dynamic import create_dynamic_variable, dynamic_bind
 from scripting.testing import observers, skip_if
 from scripting.layering import layer, layer_observers, initialize_layering
@@ -16,8 +16,16 @@ class Score:
         assert 0 <= value, "Score value must be positive"
         assert value <= maximum, f"Score value ({value}) must not be greater than maximum ({maximum})"
 
-        self.value = value
-        self.maximum = maximum
+        self.__value = value
+        self.__maximum = maximum
+
+    @property
+    def value(self):
+        return self.__value
+
+    @property
+    def maximum(self):
+        return self.__maximum
 
     def __add__(self, other):
         """
@@ -36,27 +44,35 @@ class Score:
     def __str__(self):
         return f"{self.value}/{self.maximum}"
 
+    def __repr__(self):
+        return str(self)
+
     def is_max_score(self):
         return self.value == self.maximum
+
+    def __eq__(self, other):
+        return self.value == other.value and self.maximum == other.maximum
 
 
 
 __accumulated_score = create_dynamic_variable()
 
-@contextmanager
-def keep_score(receiver):
-    with initialize_layering(), dynamic_bind(__accumulated_score, Score(0,0)):
-        with cumulative():
-            yield
 
-        receiver(__accumulated_score.value)
+@contextmanager
+def keep_score():
+    with initialize_layering(), dynamic_bind(__accumulated_score, Score(0,0)), cumulative():
+        yield
+
+
+def current_score():
+    return __accumulated_score.value
 
 
 @contextmanager
 def scale(maximum):
     with dynamic_bind(__accumulated_score, Score(0,0)):
         yield
-        score = __accumulated_score.value
+        score = current_score()
 
     __accumulated_score.value = score.rescale(maximum)
 
@@ -65,16 +81,20 @@ def scale(maximum):
 def all_or_nothing():
     failure_detected = False
 
-    def on_fail():
+    def on_pass():
+        __accumulated_score.value = __accumulated_score.value + Score(1, 1)
+
+    def on_fail_or_skip():
         nonlocal failure_detected
-        __accumulated_score.value = Score(0, __accumulated_score.value.maximum)
+        __accumulated_score.value = Score(0, __accumulated_score.value.maximum + 1)
         failure_detected = True
 
     def skip_predicate():
         return failure_detected
 
-    with layer(), layer_observers(on_fail=on_fail), skip_if(skip_predicate):
+    with layer(), layer_observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip), skip_if(skip_predicate):
         yield
+
 
 @contextmanager
 def cumulative():

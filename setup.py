@@ -24,4 +24,6 @@ setup(name='scripting',
       entry_points = {
             'console_scripts': [ 'scripting=scripting.command_line:shell_entry_point']
       },
+      test_suite='nose.collector',
+      tests_require=['nose'],
       zip_safe=False)
