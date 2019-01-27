@@ -28,6 +28,10 @@ def observers(on_pass=None, on_fail=None, on_skip=None):
 
 @contextmanager
 def skip_if(predicate):
+    '''
+    Given a boolean or predicate returning a boolean,
+    if True the tests in this group will be skipped.
+    '''
     # If necessary, turn boolean into predicate
     if type(predicate) == bool:
         value = predicate
@@ -44,6 +48,10 @@ def skip_if(predicate):
 
 @contextmanager
 def skip_unless(predicate):
+    '''
+    Given a boolean or predicate returning a boolean,
+    if False the tests in this group will be skipped.
+    '''
     # If necessary, turn boolean into predicate
     if type(predicate) == bool:
         value = predicate
@@ -55,7 +63,6 @@ def skip_unless(predicate):
     with skip_if(negated_predicate):
         yield
 
-
 def __should_test_run():
     # pylint: disable=E1102
     should_skip = (__skip_predicate.value)()
@@ -63,21 +70,36 @@ def __should_test_run():
 
 
 def __test_passed():
+    '''
+    Called whenever a test passes.
+    Notifies pass-observers.
+    '''
     for observer in __pass_observers.value:
         observer()
 
 
 def __test_failed():
+    '''
+    Called whenever a test fails.
+    Notifies fail-observers.
+    '''
     for observer in __fail_observers.value:
         observer()
 
 
 def __test_skipped():
+    '''
+    Called whenever a test is skipped.
+    Notifies skip-observers.
+    '''
     for observer in __skip_observers.value:
         observer()
 
 
 def test():
+    '''
+    Decorator for tests
+    '''
     def receiver(f):
         if __should_test_run():
             try:

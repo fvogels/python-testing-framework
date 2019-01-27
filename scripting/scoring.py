@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from scripting.dynamic import create_dynamic_variable, dynamic_bind
-from scripting.testing import observers
+from scripting.testing import observers, skip_if
 
 
 class Score:
@@ -33,7 +33,7 @@ class Score:
         return Score(self.value / self.maximum * maximum, maximum)
 
     def __str__(self):
-        return "{}/{}".format(self.value, self.maximum)
+        return f"{self.value}/{self.maximum}"
 
     def is_max_score(self):
         return self.value == self.maximum
@@ -64,3 +64,18 @@ def scale(maximum):
         score = __accumulated_score.value
 
     __accumulated_score.value = score.rescale(maximum)
+
+@contextmanager
+def all_or_nothing():
+    failure_detected = False
+
+    def on_fail():
+        nonlocal failure_detected
+        __accumulated_score.value = Score(0, __accumulated_score.value.maximum)
+        failure_detected = True
+
+    def skip_predicate():
+        return failure_detected
+
+    with observers(on_fail=on_fail), skip_if(skip_predicate):
+        yield
