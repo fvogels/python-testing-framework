@@ -13,7 +13,7 @@ def fetch_version():
       return version['__version__']
 
 
-setup(name='wif',
+setup(name='scripting',
       version=fetch_version(),
       description='Scripting Tools',
       url='http://github.com/UCLeuvenLimburg/scripting',

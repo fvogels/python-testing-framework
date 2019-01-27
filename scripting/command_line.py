@@ -1,8 +1,12 @@
 import argparse
 import sys
 import scripting
+import types
 from scripting.version import __version__
-from scripting.fileutils import find_files_recursively
+from scripting.fileutils import find_files_recursively, has_name
+from scripting.testing import initialize_testing_environment
+from scripting.scoring import Score, keep_score
+
 
 
 def __version_command(args):
@@ -16,7 +20,21 @@ def __test_command(args):
     '''
     Runs when using test command
     '''
-    print('Running tests!')
+    score = Score(0, 0)
+
+    def score_receiver(s):
+        nonlocal score
+        score = s
+
+    with initialize_testing_environment(), keep_score(score_receiver):
+        for filename in find_files_recursively(predicate=has_name('tests.py')):
+            test_module = types.ModuleType('tests')
+
+            with open(filename, 'r') as file:
+                code = file.read()
+                exec(code, test_module.__dict__)
+
+    print(score)
 
 
 def create_command_line_arguments_parser():
@@ -43,7 +61,7 @@ def shell_entry_point():
     '''
     Called from shell using 'scripting' command
     '''
-    parser  = create_command_line_arguments_parser()
+    parser = create_command_line_arguments_parser()
     args = parser.parse_args(sys.argv[1:])
 
     args.func(args)
