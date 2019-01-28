@@ -1,5 +1,5 @@
 class AssertionFailure(Exception):
-    def __init__(self, message, extra):
+    def __init__(self, message, **extra):
         super().__init__(message)
         self.__extra = extra
 
