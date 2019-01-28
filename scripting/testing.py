@@ -73,13 +73,13 @@ def _test_passed():
         observer()
 
 
-def _test_failed():
+def _test_failed(exception):
     '''
     Called whenever a test fails.
     Notifies fail-observers.
     '''
     for observer in reversed(_fail_observers.value):
-        observer()
+        observer(exception)
 
 
 def _test_skipped():
@@ -101,8 +101,11 @@ def test():
                 f()
                 _test_passed()
 
-            except AssertionFailure:
-                _test_failed()
+            except AssertionFailure as e:
+                _test_failed(e)
+
+            except Exception as e:
+                _test_failed(AssertionFailure('Unexpected exception', exception=e))
         else:
             _test_skipped()
 

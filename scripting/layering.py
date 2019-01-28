@@ -8,9 +8,9 @@ def _layer_observers(counter, on_pass=None, on_fail=None, on_skip=None):
     observer_layer = counter.value
 
     def wrap(f):
-        def observer():
+        def observer(*args):
             if counter.value == observer_layer:
-                f()
+                f(*args)
 
         return observer
 

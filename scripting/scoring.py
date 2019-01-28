@@ -87,7 +87,7 @@ def all_or_nothing():
     def on_pass():
         _accumulated_score.value = _accumulated_score.value + Score(1, 1)
 
-    def on_fail_or_skip():
+    def on_fail_or_skip(*_):
         nonlocal failure_detected
         failure_detected = True
         _accumulated_score.value = _accumulated_score.value + Score(0, 1)
@@ -107,7 +107,7 @@ def cumulative():
     def on_pass():
         _accumulated_score.value = _accumulated_score.value + Score(1, 1)
 
-    def on_fail_or_skip():
+    def on_fail_or_skip(*_):
         _accumulated_score.value = _accumulated_score.value + Score(0, 1)
 
     with _layering.add(), _layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip):
