@@ -1,7 +1,7 @@
 from contextlib import contextmanager, ExitStack
 from scripting.dynamic import create_dynamic_variable, dynamic_bind
 from scripting.testing import observers, skip_if
-from scripting.layering import layer, layer_observers, initialize_layering
+from scripting.layering import create_layering
 
 
 class Score:
@@ -59,11 +59,11 @@ class Score:
 
 
 __accumulated_score = create_dynamic_variable()
-
+__layering = create_layering()
 
 @contextmanager
 def keep_score():
-    with initialize_layering(), dynamic_bind(__accumulated_score, Score(0,0)), cumulative():
+    with __layering.initialize(), dynamic_bind(__accumulated_score, Score(0,0)), cumulative():
         yield
 
 
@@ -95,7 +95,7 @@ def all_or_nothing():
     def skip_predicate():
         return failure_detected
 
-    with layer(), layer_observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip), skip_if(skip_predicate):
+    with __layering.add(), __layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip), skip_if(skip_predicate):
         yield
 
         if not __accumulated_score.value.is_max_score():
@@ -110,5 +110,5 @@ def cumulative():
     def on_fail_or_skip():
         __accumulated_score.value = __accumulated_score.value + Score(0, 1)
 
-    with layer(), layer_observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip):
+    with __layering.add(), __layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip):
         yield
