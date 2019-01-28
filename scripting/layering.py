@@ -4,7 +4,7 @@ from scripting.testing import observers, skip_if
 
 
 @contextmanager
-def _layer_observers(counter, on_pass=None, on_fail=None, on_skip=None):
+def _layered_observers(counter, on_pass=None, on_fail=None, on_skip=None):
     observer_layer = counter.value
 
     def wrap(f):
@@ -23,6 +23,23 @@ def _layer_observers(counter, on_pass=None, on_fail=None, on_skip=None):
 
 
 @contextmanager
+def _layered_skip_if(counter, skip_if):
+    observer_layer = counter.value
+
+    def wrap(f):
+        def wrapped(*args):
+            if counter.value == observer_layer:
+                return f(*args)
+            else:
+                return False
+
+        return wrapped
+
+    with skip_if(wrap(skip_if)):
+        yield
+
+
+@contextmanager
 def _add_layer(counter):
     with dynamic_bind(counter, counter.value + 1):
         yield
@@ -36,7 +53,10 @@ class _Layering:
         return _add_layer(self.__counter)
 
     def observers(self, on_pass=None, on_fail=None, on_skip=None):
-        return _layer_observers(self.__counter, on_pass=on_pass, on_fail=on_fail, on_skip=on_skip)
+        return _layered_observers(self.__counter, on_pass=on_pass, on_fail=on_fail, on_skip=on_skip)
+
+    def skip_if(self, predicate):
+        return _layered_skip_if(self.__counter, predicate)
 
 
 def create_layering():
