@@ -2,16 +2,12 @@ from contextlib import contextmanager, ExitStack
 from scripting.assertions import AssertionFailure
 from scripting.dynamic import create_dynamic_variable, dynamic_bind, dynamic_append
 
-_pass_observers = create_dynamic_variable()
-_skip_observers = create_dynamic_variable()
-_fail_observers = create_dynamic_variable()
-_skip_predicate = create_dynamic_variable()
 
+_pass_observers = create_dynamic_variable().bind([])
+_skip_observers = create_dynamic_variable().bind([])
+_fail_observers = create_dynamic_variable().bind([])
+_skip_predicate = create_dynamic_variable().bind(lambda: False)
 
-@contextmanager
-def initialize_testing_environment():
-    with dynamic_bind(_pass_observers, []), dynamic_bind(_skip_observers, []), dynamic_bind(_fail_observers, []), dynamic_bind(_skip_predicate, lambda: False):
-        yield
 
 @contextmanager
 def observers(on_pass=None, on_fail=None, on_skip=None):

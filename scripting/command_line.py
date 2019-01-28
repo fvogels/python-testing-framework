@@ -4,7 +4,6 @@ import scripting
 import types
 from scripting.version import __version__
 from scripting.fileutils import find_files_recursively, has_name
-from scripting.testing import initialize_testing_environment
 from scripting.scoring import Score, keep_score, current_score
 
 
@@ -20,7 +19,7 @@ def _test_command(args):
     '''
     Runs when using test command
     '''
-    with initialize_testing_environment(), keep_score():
+    with keep_score():
         for filename in find_files_recursively(predicate=has_name('tests.py')):
             test_module = types.ModuleType('tests')
 

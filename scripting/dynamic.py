@@ -7,9 +7,11 @@ class DynamicVariable:
 
     def bind(self, value):
         self.__stack.append(value)
+        return self
 
     def unbind(self):
         self.__stack.pop()
+        return self
 
     @property
     def value(self):
