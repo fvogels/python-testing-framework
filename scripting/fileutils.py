@@ -1,3 +1,4 @@
+from contextlib import contextmanager
 import types
 import os
 
@@ -47,6 +48,15 @@ def execute_code(filename):
     Executes code in given file.
     Does not interfere with outside environment.
     '''
-    load_code(filename, 'tested')
+    load_code(filename, 'run')
 
 
+@contextmanager
+def inside_directory(path):
+    current = os.getcwd()
+
+    try:
+        os.chdir(path)
+        yield
+    finally:
+        os.chdir(current)

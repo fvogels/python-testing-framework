@@ -58,6 +58,13 @@ def skip_unless(predicate):
     with skip_if(negated_predicate):
         yield
 
+
+@contextmanager
+def skip():
+    with skip_if(True):
+        yield
+
+
 def _should_test_run():
     # pylint: disable=E1102
     should_skip = (_skip_predicate.value)()

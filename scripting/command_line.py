@@ -1,11 +1,12 @@
 import argparse
 import sys
-import scripting
+import os
 import types
 from scripting.version import __version__
-from scripting.fileutils import find_files_recursively, has_name, execute_code
+from scripting.fileutils import find_files_recursively, has_name, execute_code, inside_directory
 from scripting.scoring import Score, keep_score
 from scripting.counting import keep_counts
+from scripting.tested import tested_file
 
 
 
@@ -22,7 +23,8 @@ def _test_command(args):
     '''
     with keep_score() as current_score, keep_counts() as current_counts:
         for filename in find_files_recursively(predicate=has_name('tests.py')):
-            execute_code(filename)
+            with inside_directory(os.path.dirname(filename)), tested_file(args.tested_file):
+                execute_code(filename)
 
         score = current_score()
         counts = current_counts()
@@ -46,6 +48,7 @@ def create_command_line_arguments_parser():
 
     # Test command parser
     test_parser = subparsers.add_parser('test', help='runs tests in all subdirectories')
+    test_parser.add_argument('--tested-file', help='File where tested code resides (default: student.py)', default='student.py')
     test_parser.set_defaults(func=_test_command)
 
     return parser
