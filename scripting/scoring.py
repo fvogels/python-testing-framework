@@ -63,7 +63,7 @@ _layering = create_layering()
 
 @contextmanager
 def keep_score():
-    with _layering.initialize(), dynamic_bind(_accumulated_score, Score(0,0)), cumulative():
+    with dynamic_bind(_accumulated_score, Score(0,0)), cumulative():
         yield
 
 

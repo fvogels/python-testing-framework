@@ -28,17 +28,9 @@ def _add_layer(counter):
         yield
 
 
-@contextmanager
-def _initialize_layering(counter):
-    with dynamic_bind(counter, 0):
-        yield
-
 class _Layering:
     def __init__(self):
-        self.__counter = create_dynamic_variable()
-
-    def initialize(self):
-        return _initialize_layering(self.__counter)
+        self.__counter = create_dynamic_variable().bind(0)
 
     def add(self):
         return _add_layer(self.__counter)
