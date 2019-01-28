@@ -3,8 +3,8 @@ import sys
 import scripting
 import types
 from scripting.version import __version__
-from scripting.fileutils import find_files_recursively, has_name
-from scripting.scoring import Score, keep_score, current_score
+from scripting.fileutils import find_files_recursively, has_name, execute_code
+from scripting.scoring import Score, keep_score
 from scripting.counting import keep_counts
 
 
@@ -22,11 +22,7 @@ def _test_command(args):
     '''
     with keep_score() as current_score, keep_counts() as current_counts:
         for filename in find_files_recursively(predicate=has_name('tests.py')):
-            test_module = types.ModuleType('tests')
-
-            with open(filename, 'r') as file:
-                code = file.read()
-                exec(code, test_module.__dict__)
+            execute_code(filename)
 
         score = current_score()
         counts = current_counts()
