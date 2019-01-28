@@ -9,14 +9,14 @@ from scripting.scoring import Score, keep_score, current_score
 
 
 
-def __version_command(args):
+def _version_command(args):
     '''
     Runs when using version command
     '''
     print(__version__)
 
 
-def __test_command(args):
+def _test_command(args):
     '''
     Runs when using test command
     '''
@@ -44,11 +44,11 @@ def create_command_line_arguments_parser():
 
     # Version command parser
     test_parser = subparsers.add_parser('version', help='returns version')
-    test_parser.set_defaults(func=__version_command)
+    test_parser.set_defaults(func=_version_command)
 
     # Test command parser
     test_parser = subparsers.add_parser('test', help='runs tests in all subdirectories')
-    test_parser.set_defaults(func=__test_command)
+    test_parser.set_defaults(func=_test_command)
 
     return parser
 

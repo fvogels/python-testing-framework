@@ -58,26 +58,26 @@ class Score:
 
 
 
-__accumulated_score = create_dynamic_variable()
-__layering = create_layering()
+_accumulated_score = create_dynamic_variable()
+_layering = create_layering()
 
 @contextmanager
 def keep_score():
-    with __layering.initialize(), dynamic_bind(__accumulated_score, Score(0,0)), cumulative():
+    with _layering.initialize(), dynamic_bind(_accumulated_score, Score(0,0)), cumulative():
         yield
 
 
 def current_score():
-    return __accumulated_score.value
+    return _accumulated_score.value
 
 
 @contextmanager
 def scale(maximum):
-    with dynamic_bind(__accumulated_score, Score(0,0)):
+    with dynamic_bind(_accumulated_score, Score(0,0)):
         yield
         score = current_score()
 
-    __accumulated_score.value = score.rescale(maximum)
+    _accumulated_score.value = score.rescale(maximum)
 
 
 @contextmanager
@@ -85,30 +85,30 @@ def all_or_nothing():
     failure_detected = False
 
     def on_pass():
-        __accumulated_score.value = __accumulated_score.value + Score(1, 1)
+        _accumulated_score.value = _accumulated_score.value + Score(1, 1)
 
     def on_fail_or_skip():
         nonlocal failure_detected
         failure_detected = True
-        __accumulated_score.value = __accumulated_score.value + Score(0, 1)
+        _accumulated_score.value = _accumulated_score.value + Score(0, 1)
 
     def skip_predicate():
         return failure_detected
 
-    with __layering.add(), __layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip), skip_if(skip_predicate):
+    with _layering.add(), _layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip), skip_if(skip_predicate):
         yield
 
-        if not __accumulated_score.value.is_max_score():
-            __accumulated_score.value = __accumulated_score.value.zero()
+        if not _accumulated_score.value.is_max_score():
+            _accumulated_score.value = _accumulated_score.value.zero()
 
 
 @contextmanager
 def cumulative():
     def on_pass():
-        __accumulated_score.value = __accumulated_score.value + Score(1, 1)
+        _accumulated_score.value = _accumulated_score.value + Score(1, 1)
 
     def on_fail_or_skip():
-        __accumulated_score.value = __accumulated_score.value + Score(0, 1)
+        _accumulated_score.value = _accumulated_score.value + Score(0, 1)
 
-    with __layering.add(), __layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip):
+    with _layering.add(), _layering.observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip):
         yield

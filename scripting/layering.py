@@ -33,7 +33,7 @@ def _initialize_layering(counter):
     with dynamic_bind(counter, 0):
         yield
 
-class __Layering:
+class _Layering:
     def __init__(self):
         self.__counter = create_dynamic_variable()
 
@@ -48,5 +48,5 @@ class __Layering:
 
 
 def create_layering():
-    return __Layering()
+    return _Layering()
 

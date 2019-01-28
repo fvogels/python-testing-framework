@@ -2,26 +2,26 @@ from contextlib import contextmanager, ExitStack
 from scripting.assertions import AssertionFailure
 from scripting.dynamic import create_dynamic_variable, dynamic_bind, dynamic_append
 
-__pass_observers = create_dynamic_variable()
-__skip_observers = create_dynamic_variable()
-__fail_observers = create_dynamic_variable()
-__skip_predicate = create_dynamic_variable()
+_pass_observers = create_dynamic_variable()
+_skip_observers = create_dynamic_variable()
+_fail_observers = create_dynamic_variable()
+_skip_predicate = create_dynamic_variable()
 
 
 @contextmanager
 def initialize_testing_environment():
-    with dynamic_bind(__pass_observers, []), dynamic_bind(__skip_observers, []), dynamic_bind(__fail_observers, []), dynamic_bind(__skip_predicate, lambda: False):
+    with dynamic_bind(_pass_observers, []), dynamic_bind(_skip_observers, []), dynamic_bind(_fail_observers, []), dynamic_bind(_skip_predicate, lambda: False):
         yield
 
 @contextmanager
 def observers(on_pass=None, on_fail=None, on_skip=None):
     with ExitStack() as stack:
         if on_pass:
-            stack.enter_context(dynamic_append(__pass_observers, on_pass))
+            stack.enter_context(dynamic_append(_pass_observers, on_pass))
         if on_fail:
-            stack.enter_context(dynamic_append(__fail_observers, on_fail))
+            stack.enter_context(dynamic_append(_fail_observers, on_fail))
         if on_skip:
-            stack.enter_context(dynamic_append(__skip_observers, on_skip))
+            stack.enter_context(dynamic_append(_skip_observers, on_skip))
 
         yield
 
@@ -36,13 +36,13 @@ def skip_if(predicate):
         value = predicate
         predicate = lambda: value
 
-    previous = __skip_predicate.value
+    previous = _skip_predicate.value
 
     def new_predicate():
         result = previous() or predicate()
         return result
 
-    with dynamic_bind(__skip_predicate, new_predicate):
+    with dynamic_bind(_skip_predicate, new_predicate):
         yield
 
 @contextmanager
@@ -62,36 +62,36 @@ def skip_unless(predicate):
     with skip_if(negated_predicate):
         yield
 
-def __should_test_run():
+def _should_test_run():
     # pylint: disable=E1102
-    should_skip = (__skip_predicate.value)()
+    should_skip = (_skip_predicate.value)()
     return not should_skip
 
 
-def __test_passed():
+def _test_passed():
     '''
     Called whenever a test passes.
     Notifies pass-observers.
     '''
-    for observer in reversed(__pass_observers.value):
+    for observer in reversed(_pass_observers.value):
         observer()
 
 
-def __test_failed():
+def _test_failed():
     '''
     Called whenever a test fails.
     Notifies fail-observers.
     '''
-    for observer in reversed(__fail_observers.value):
+    for observer in reversed(_fail_observers.value):
         observer()
 
 
-def __test_skipped():
+def _test_skipped():
     '''
     Called whenever a test is skipped.
     Notifies skip-observers.
     '''
-    for observer in reversed(__skip_observers.value):
+    for observer in reversed(_skip_observers.value):
         observer()
 
 
@@ -100,14 +100,14 @@ def test():
     Decorator for tests
     '''
     def receiver(f):
-        if __should_test_run():
+        if _should_test_run():
             try:
                 f()
-                __test_passed()
+                _test_passed()
 
             except AssertionFailure:
-                __test_failed()
+                _test_failed()
         else:
-            __test_skipped()
+            _test_skipped()
 
     return receiver
