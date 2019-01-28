@@ -6,6 +6,8 @@ from scripting.testing import observers, skip_if
 __layer = create_dynamic_variable()
 
 
+
+
 @contextmanager
 def initialize_layering():
     with dynamic_bind(__layer, 0):

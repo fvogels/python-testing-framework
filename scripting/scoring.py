@@ -27,6 +27,9 @@ class Score:
     def maximum(self):
         return self.__maximum
 
+    def zero(self):
+        return Score(0, self.__maximum)
+
     def __add__(self, other):
         """
         Adds two scores together.
@@ -86,14 +89,17 @@ def all_or_nothing():
 
     def on_fail_or_skip():
         nonlocal failure_detected
-        __accumulated_score.value = Score(0, __accumulated_score.value.maximum + 1)
         failure_detected = True
+        __accumulated_score.value = __accumulated_score.value + Score(0, 1)
 
     def skip_predicate():
         return failure_detected
 
     with layer(), layer_observers(on_pass=on_pass, on_fail=on_fail_or_skip, on_skip=on_fail_or_skip), skip_if(skip_predicate):
         yield
+
+        if not __accumulated_score.value.is_max_score():
+            __accumulated_score.value = __accumulated_score.value.zero()
 
 
 @contextmanager
