@@ -20,7 +20,7 @@ def _test_command(args):
     '''
     Runs when using test command
     '''
-    with keep_score(), keep_counts() as current_counts:
+    with keep_score() as current_score, keep_counts() as current_counts:
         for filename in find_files_recursively(predicate=has_name('tests.py')):
             test_module = types.ModuleType('tests')
 

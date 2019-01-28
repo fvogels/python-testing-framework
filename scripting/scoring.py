@@ -61,21 +61,22 @@ class Score:
 _accumulated_score = create_dynamic_variable()
 _layering = create_layering()
 
+
+def _current_score():
+    return _accumulated_score.value
+
+
 @contextmanager
 def keep_score():
     with dynamic_bind(_accumulated_score, Score(0,0)), cumulative():
-        yield
-
-
-def current_score():
-    return _accumulated_score.value
+        yield _current_score
 
 
 @contextmanager
 def scale(maximum):
     with dynamic_bind(_accumulated_score, Score(0,0)):
         yield
-        score = current_score()
+        score = _current_score()
 
     _accumulated_score.value = score.rescale(maximum)
 
