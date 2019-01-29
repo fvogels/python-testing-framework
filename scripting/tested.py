@@ -7,18 +7,18 @@ from scripting.fileutils import load_code
 _tested_module = create_dynamic_variable()
 
 
-@contextmanager
-def tested_file(filename):
-    module = load_code(filename, 'tested')
+# @contextmanager
+# def tested_file(filename):
+#     module = load_code(filename, 'tested')
 
-    with dynamic_bind(_tested_module, module):
-        yield
+#     with dynamic_bind(_tested_module, module):
+#         yield
 
 
-@contextmanager
-def tested_function(identifier):
-    if hasattr(_tested_module.value, identifier):
-        yield getattr(_tested_module.value, identifier)
-    else:
-        with skip():
-            yield None
+# @contextmanager
+# def tested_function(identifier):
+#     if hasattr(_tested_module.value, identifier):
+#         yield getattr(_tested_module.value, identifier)
+#     else:
+#         with skip():
+#             yield None
