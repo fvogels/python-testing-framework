@@ -17,6 +17,16 @@ def assert_equal(expected, actual, **kwargs):
         fail(message=f'Expected {expected}, received {actual}', **kwargs)
 
 
+def assert_truthy(actual, **kwargs):
+    if not actual:
+        fail(message=f'Expected truthy value, received {actual}', **kwargs)
+
+
+def assert_falsey(actual, **kwargs):
+    if actual:
+        fail(message=f'Expected falsey value, received {actual}', **kwargs)
+
+
 def assert_equal_results(expected, actual):
     assert_equal(expected=expected.return_value, actual=actual.return_value, message=f"Expected return value is {expected.return_value}, actual is {actual.return_value}")
 

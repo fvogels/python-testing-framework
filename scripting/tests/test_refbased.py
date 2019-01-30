@@ -2,7 +2,7 @@ from unittest import TestCase
 from scripting.fileutils import find_files_recursively, has_name
 from scripting.testing import test, skip_if
 from scripting.scoring import Score, keep_score, all_or_nothing, cumulative
-from scripting.reference import reference_based_testing
+from scripting.reference import reference_based_test
 
 
 class TestScoring(TestCase):
@@ -13,7 +13,7 @@ class TestScoring(TestCase):
         def testimpl(x):
             return x
 
-        with keep_score() as current_score, reference_based_testing(refimpl, testimpl) as testcase:
+        with keep_score() as current_score, reference_based_test(refimpl, testimpl) as testcase:
             testcase(0)
             testcase(1)
             testcase(2)
@@ -28,7 +28,7 @@ class TestScoring(TestCase):
         def testimpl(x):
             return x * 2
 
-        with keep_score() as current_score, reference_based_testing(refimpl, testimpl) as testcase:
+        with keep_score() as current_score, reference_based_test(refimpl, testimpl) as testcase:
             testcase(0)
             testcase(1)
             testcase(2)
@@ -43,7 +43,7 @@ class TestScoring(TestCase):
         def testimpl(xs):
             return xs.append(1)
 
-        with keep_score() as current_score, reference_based_testing(refimpl, testimpl) as testcase:
+        with keep_score() as current_score, reference_based_test(refimpl, testimpl) as testcase:
             testcase([])
             testcase([1])
             testcase([2])
@@ -58,7 +58,7 @@ class TestScoring(TestCase):
         def testimpl(xs):
             return xs.append(2)
 
-        with keep_score() as current_score, reference_based_testing(refimpl, testimpl) as testcase:
+        with keep_score() as current_score, reference_based_test(refimpl, testimpl) as testcase:
             testcase([])
             testcase([1])
             testcase([2])

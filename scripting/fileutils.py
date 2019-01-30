@@ -29,26 +29,33 @@ def has_name(name):
     return predicate
 
 
-def load_code(filename, module_name):
+def load_code_from_string_into_module(string, module_name):
+    '''
+    Executes code from string and puts it into module.
+    Does not interfere without outside environment.
+    '''
+    module = types.ModuleType(module_name)
+    exec(string, module.__dict__)
+
+    return module
+
+
+def load_code_from_file_into_module(filename, module_name):
     '''
     Loads code from .py module and puts it into module.
     Does not interfere without outside environment.
     '''
-    module = types.ModuleType(module_name)
-
     with open(filename, 'r') as file:
         code = file.read()
-        exec(code, module.__dict__)
 
-    return module
-
+    return load_code_from_string_into_module(code, module_name)
 
 def execute_code(filename):
     '''
     Executes code in given file.
     Does not interfere with outside environment.
     '''
-    load_code(filename, 'run')
+    load_code_from_file_into_module(filename, 'run')
 
 
 @contextmanager
