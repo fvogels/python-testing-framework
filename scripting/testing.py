@@ -41,6 +41,7 @@ def skip_if(predicate):
     with dynamic_bind(_skip_predicate, new_predicate):
         yield
 
+
 @contextmanager
 def skip_unless(predicate):
     '''

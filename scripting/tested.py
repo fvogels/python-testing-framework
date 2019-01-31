@@ -2,10 +2,12 @@ from contextlib import contextmanager, ExitStack
 from scripting.dynamic import create_dynamic_variable, dynamic_bind, dynamic_append
 from scripting.testing import test, skip
 from scripting.fileutils import load_code_from_file_into_module
+from scripting.testing import skip_unless
 
 
 _tested_module = create_dynamic_variable()
 _active_tested_implementation = create_dynamic_variable()
+_active_tested_implementation_id = create_dynamic_variable()
 
 
 @contextmanager
@@ -38,9 +40,15 @@ def active_tested_implementation(implementation):
 
 @contextmanager
 def active_tested_implementation_from_id(identifier):
-    with dynamic_bind(_active_tested_implementation, fetch_tested_implementation(identifier)):
+    tested_implementation = fetch_tested_implementation(identifier)
+
+    with dynamic_bind(_active_tested_implementation, tested_implementation), dynamic_bind(_active_tested_implementation_id, identifier), skip_unless(bool(tested_implementation)):
         yield
 
 
 def current_active_tested_implementation():
     return _active_tested_implementation.value
+
+
+def current_active_tested_implementation_id():
+    return _active_tested_implementation_id.value

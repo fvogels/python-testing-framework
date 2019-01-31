@@ -24,7 +24,7 @@ def _test_command(args):
     with keep_score() as current_score, keep_counts() as current_counts, reporting():
         for filename in find_files_recursively(predicate=has_name(args.tests_file)):
             with inside_directory(os.path.dirname(filename)), tested_file(args.tested_file):
-                execute_code(filename)
+                execute_code(os.path.basename(filename))
 
         score = current_score()
         counts = current_counts()

@@ -50,6 +50,7 @@ def load_code_from_file_into_module(filename, module_name):
 
     return load_code_from_string_into_module(code, module_name)
 
+
 def execute_code(filename):
     '''
     Executes code in given file.
