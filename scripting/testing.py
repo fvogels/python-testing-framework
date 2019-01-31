@@ -6,7 +6,7 @@ from scripting.dynamic import create_dynamic_variable, dynamic_bind, dynamic_app
 _pass_observers = create_dynamic_variable().bind([])
 _skip_observers = create_dynamic_variable().bind([])
 _fail_observers = create_dynamic_variable().bind([])
-_skip_predicate = create_dynamic_variable().bind(lambda: False)
+_skip_condition = create_dynamic_variable().bind(lambda: False)
 
 
 @contextmanager
@@ -22,41 +22,41 @@ def observers(on_pass=None, on_fail=None, on_skip=None):
         yield
 
 @contextmanager
-def skip_if(predicate):
+def skip_if(condition):
     '''
-    Given a boolean or predicate returning a boolean,
+    Given a boolean or function returning a boolean,
     if True the tests in this group will be skipped.
     '''
-    # If necessary, turn boolean into predicate
-    if type(predicate) == bool:
-        value = predicate
-        predicate = lambda: value
+    # If necessary, turn boolean into function
+    if type(condition) == bool:
+        value = condition
+        condition = lambda: value
 
-    previous = _skip_predicate.value
+    previous = _skip_condition.value
 
-    def new_predicate():
-        result = previous() or predicate()
+    def new_condition():
+        result = previous() or condition()
         return result
 
-    with dynamic_bind(_skip_predicate, new_predicate):
+    with dynamic_bind(_skip_condition, new_condition):
         yield
 
 
 @contextmanager
-def skip_unless(predicate):
+def skip_unless(condition):
     '''
-    Given a boolean or predicate returning a boolean,
+    Given a boolean or function returning a boolean,
     if False the tests in this group will be skipped.
     '''
-    # If necessary, turn boolean into predicate
-    if type(predicate) == bool:
-        value = predicate
-        predicate = lambda: value
+    # If necessary, turn boolean into function
+    if type(condition) == bool:
+        value = condition
+        condition = lambda: value
 
-    def negated_predicate():
-        return not predicate()
+    def negated_condition():
+        return not condition()
 
-    with skip_if(negated_predicate):
+    with skip_if(negated_condition):
         yield
 
 
@@ -68,7 +68,7 @@ def skip():
 
 def _should_test_run():
     # pylint: disable=E1102
-    should_skip = (_skip_predicate.value)()
+    should_skip = (_skip_condition.value)()
     return not should_skip
 
 
