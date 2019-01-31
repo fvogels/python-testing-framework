@@ -77,7 +77,7 @@ def scale(maximum):
         yield
         score = _current_score()
 
-    _accumulated_score.value = score.rescale(maximum)
+    _accumulated_score.value = _accumulated_score.value + score.rescale(maximum)
 
 
 @contextmanager
