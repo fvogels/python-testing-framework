@@ -42,5 +42,5 @@ def active_tested_implementation_from_id(identifier):
         yield
 
 
-def current_active_reference_implementation():
+def current_active_tested_implementation():
     return _active_tested_implementation.value
