@@ -7,7 +7,7 @@ from scripting.fileutils import find_files_recursively, has_name, execute_code, 
 from scripting.scoring import Score, keep_score
 from scripting.counting import keep_counts
 from scripting.tested import tested_file
-
+from scripting.reporting import reporting
 
 
 def _version_command(args):
@@ -21,7 +21,7 @@ def _test_command(args):
     '''
     Runs when using test command
     '''
-    with keep_score() as current_score, keep_counts() as current_counts:
+    with keep_score() as current_score, keep_counts() as current_counts, reporting():
         for filename in find_files_recursively(predicate=has_name(args.tests_file)):
             with inside_directory(os.path.dirname(filename)), tested_file(args.tested_file):
                 execute_code(filename)

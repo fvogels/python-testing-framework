@@ -112,7 +112,7 @@ def test():
                 _test_failed(e)
 
             except Exception as e:
-                _test_failed(AssertionFailure('Unexpected exception', exception=e))
+                _test_failed(AssertionFailure(f'Unexpected exception {e}', exception=e))
         else:
             _test_skipped()
 
