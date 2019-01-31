@@ -25,6 +25,7 @@ def _test_command(args):
     with keep_score() as current_score, keep_counts() as current_counts, reporting():
         for path_to_tests in find_files_recursively(predicate=has_name(args.tests_file)):
             directory_containing_tests = os.path.dirname(path_to_tests)
+
             with inside_directory(directory_containing_tests):
                 tested_file_present = os.path.isfile(args.tested_file)
                 filename_of_tests = os.path.basename(path_to_tests)

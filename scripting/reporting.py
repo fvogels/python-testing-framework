@@ -13,6 +13,7 @@ def _increment_index():
 @contextmanager
 def reporting():
     def on_pass():
+        # print(f'[{_tested_index.value}] PASS')
         _increment_index()
 
     def on_fail(e):

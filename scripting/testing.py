@@ -35,8 +35,7 @@ def skip_if(condition):
     previous = _skip_condition.value
 
     def new_condition():
-        result = previous() or condition()
-        return result
+        return previous() or condition()
 
     with dynamic_bind(_skip_condition, new_condition):
         yield
