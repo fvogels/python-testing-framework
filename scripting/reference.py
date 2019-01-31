@@ -24,10 +24,9 @@ def reference_file(filename):
         yield
 
 
-@contextmanager
-def reference_implementation(identifier):
+def fetch_reference_implementation(identifier):
     if hasattr(_reference_module.value, identifier):
-        yield getattr(_reference_module.value, identifier)
+        return getattr(_reference_module.value, identifier)
     else:
         print(f'Could not find {identifier} in solution module')
         sys.exit(-1)

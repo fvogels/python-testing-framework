@@ -21,10 +21,9 @@ def tested_file(filename):
         yield
 
 
-@contextmanager
-def tested_implementation(identifier):
+def fetch_tested_implementation(identifier):
     if hasattr(_tested_module.value, identifier):
-        yield getattr(_tested_module.value, identifier)
+        return getattr(_tested_module.value, identifier)
     else:
         with skip():
-            yield None
+            return None
