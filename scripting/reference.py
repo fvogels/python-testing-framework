@@ -8,6 +8,7 @@ import sys
 
 
 _reference_module = create_dynamic_variable()
+_active_reference_implementation = create_dynamic_variable()
 
 
 @contextmanager
@@ -30,6 +31,22 @@ def fetch_reference_implementation(identifier):
     else:
         print(f'Could not find {identifier} in solution module')
         sys.exit(-1)
+
+
+@contextmanager
+def active_reference_implementation(implementation):
+    with dynamic_bind(_active_reference_implementation, implementation):
+        yield
+
+
+@contextmanager
+def active_reference_implementation_from_id(identifier):
+    with dynamic_bind(_active_reference_implementation, fetch_reference_implementation(identifier)):
+        yield
+
+
+def current_active_reference_implementation():
+    return _active_reference_implementation.value
 
 
 @contextmanager

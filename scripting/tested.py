@@ -5,6 +5,7 @@ from scripting.fileutils import load_code_from_file_into_module
 
 
 _tested_module = create_dynamic_variable()
+_active_tested_implementation = create_dynamic_variable()
 
 
 @contextmanager
@@ -27,3 +28,19 @@ def fetch_tested_implementation(identifier):
     else:
         with skip():
             return None
+
+
+@contextmanager
+def active_tested_implementation(implementation):
+    with dynamic_bind(_active_tested_implementation, implementation):
+        yield
+
+
+@contextmanager
+def active_tested_implementation_from_id(identifier):
+    with dynamic_bind(_active_tested_implementation, fetch_tested_implementation(identifier)):
+        yield
+
+
+def current_active_reference_implementation():
+    return _active_tested_implementation.value
