@@ -22,7 +22,7 @@ def _test_command(args):
     Runs when using test command
     '''
     with keep_score() as current_score, keep_counts() as current_counts:
-        for filename in find_files_recursively(predicate=has_name('tests.py')):
+        for filename in find_files_recursively(predicate=has_name(args.tests_file)):
             with inside_directory(os.path.dirname(filename)), tested_file(args.tested_file):
                 execute_code(filename)
 
@@ -49,6 +49,7 @@ def create_command_line_arguments_parser():
     # Test command parser
     test_parser = subparsers.add_parser('test', help='runs tests in all subdirectories')
     test_parser.add_argument('--tested-file', help='File where tested code resides (default: student.py)', default='student.py')
+    test_parser.add_argument('--tests-file', help='File where tests resides (default: tests.py)', default='tests.py')
     test_parser.set_defaults(func=_test_command)
 
     return parser
