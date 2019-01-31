@@ -8,6 +8,7 @@ from scripting.scoring import Score, keep_score
 from scripting.counting import keep_counts
 from scripting.tested import tested_file
 from scripting.reporting import reporting
+from scripting.testing import skip
 
 
 def _version_command(args):
@@ -22,9 +23,22 @@ def _test_command(args):
     Runs when using test command
     '''
     with keep_score() as current_score, keep_counts() as current_counts, reporting():
-        for filename in find_files_recursively(predicate=has_name(args.tests_file)):
-            with inside_directory(os.path.dirname(filename)), tested_file(args.tested_file):
-                execute_code(os.path.basename(filename))
+        for path_to_tests in find_files_recursively(predicate=has_name(args.tests_file)):
+            directory_containing_tests = os.path.dirname(path_to_tests)
+            with inside_directory(directory_containing_tests):
+                tested_file_present = os.path.isfile(args.tested_file)
+                filename_of_tests = os.path.basename(path_to_tests)
+
+                if not tested_file_present:
+                    print(f"ERROR: Could not find {args.tested_file} in {os.path.abspath(directory_containing_tests)}")
+
+                    if args.ignore_missing_tested_file:
+                        print(f"WARNING: Continuing with testing --- tests will be fully ignored, not even be counted as skipped")
+                    else:
+                        sys.exit(-1)
+                else:
+                    with tested_file(args.tested_file):
+                        execute_code(os.path.basename(filename_of_tests))
 
         score = current_score()
         counts = current_counts()
@@ -48,6 +62,7 @@ def create_command_line_arguments_parser():
 
     # Test command parser
     test_parser = subparsers.add_parser('test', help='runs tests in all subdirectories')
+    test_parser.add_argument('--ignore-missing-tested-file', help='If tested file is missing, simply skip tests', action='store_true')
     test_parser.add_argument('--tested-file', help='File where tested code resides (default: student.py)', default='student.py')
     test_parser.add_argument('--tests-file', help='File where tests resides (default: tests.py)', default='tests.py')
     test_parser.set_defaults(func=_test_command)
