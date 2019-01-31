@@ -14,17 +14,20 @@ def fail(message = '', **kwargs):
 
 def assert_equal(expected, actual, **kwargs):
     if expected != actual:
-        fail(message=f'Expected {expected}, received {actual}', **kwargs)
+        kwargs = { **kwargs, 'message': f'Expected {expected}, received {actual}' }
+        fail(**kwargs)
 
 
 def assert_truthy(actual, **kwargs):
     if not actual:
-        fail(message=f'Expected truthy value, received {actual}', **kwargs)
+        kwargs = { **kwargs, 'message': f'Expected truthy value, received {actual}' }
+        fail(**kwargs)
 
 
 def assert_falsey(actual, **kwargs):
     if actual:
-        fail(message=f'Expected falsey value, received {actual}', **kwargs)
+        kwargs = { **kwargs, 'message': f'Expected falsey value, received {actual}' }
+        fail(**kwargs)
 
 
 def assert_equal_results(expected, actual):
