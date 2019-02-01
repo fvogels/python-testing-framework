@@ -44,8 +44,11 @@ def _test_command(args):
         score = current_score()
         counts = current_counts()
 
-    print(score)
-    print(counts)
+    print(f'PASS {counts.npass}')
+    print(f'FAIL {counts.nfail}')
+    print(f'SKIP {counts.nskip}')
+    print(f'Score: {score}')
+
 
 
 def create_command_line_arguments_parser():
