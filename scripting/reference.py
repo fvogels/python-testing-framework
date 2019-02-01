@@ -30,6 +30,10 @@ def fetch_reference_implementation(identifier):
         return getattr(_reference_module.value, identifier)
     else:
         print(f'Could not find {identifier} in solution module')
+        print(f'It contains the following members:')
+
+        for member in dir(_reference_module.value):
+            print(f"  {member}")
         sys.exit(-1)
 
 
