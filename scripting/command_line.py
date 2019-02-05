@@ -7,7 +7,7 @@ from scripting.fileutils import find_files_recursively, has_name, execute_code, 
 from scripting.scoring import Score, keep_score
 from scripting.counting import keep_counts
 from scripting.tested import tested_file
-from scripting.reporting import reporting
+from scripting.reporting import reporting, format_context, context
 from scripting.testing import skip
 
 
@@ -22,42 +22,32 @@ def _test_command(args):
     '''
     Runs when using test command
     '''
-    test_index = 0
 
-    def report_pass():
-        nonlocal test_index
-        test_index += 1
+    with keep_score() as current_score, keep_counts() as current_counts:
+        def report_fail(e):
+             print(f'[{current_counts().test_index}] FAIL {str(e)}\n{format_context()}=====')
 
-    def report_fail(e):
-        nonlocal test_index
-        print(f'[{test_index}] FAIL {str(e)}')
-        test_index += 1
+        with reporting(on_fail=report_fail):
+            for path_to_tests in find_files_recursively(predicate=has_name(args.tests_file)):
+                directory_containing_tests = os.path.dirname(path_to_tests)
 
-    def report_skip():
-        nonlocal test_index
-        test_index += 1
+                with inside_directory(directory_containing_tests):
+                    tested_file_present = os.path.isfile(args.tested_file)
+                    filename_of_tests = os.path.basename(path_to_tests)
 
-    with keep_score() as current_score, keep_counts() as current_counts, reporting(on_pass=report_pass, on_fail=report_fail, on_skip=report_skip):
-        for path_to_tests in find_files_recursively(predicate=has_name(args.tests_file)):
-            directory_containing_tests = os.path.dirname(path_to_tests)
+                    if not tested_file_present:
+                        print(f"ERROR: Could not find {args.tested_file} in {os.path.abspath(directory_containing_tests)}")
 
-            with inside_directory(directory_containing_tests):
-                tested_file_present = os.path.isfile(args.tested_file)
-                filename_of_tests = os.path.basename(path_to_tests)
-
-                if not tested_file_present:
-                    print(f"ERROR: Could not find {args.tested_file} in {os.path.abspath(directory_containing_tests)}")
-
-                    if args.ignore_missing_tested_file:
-                        print(f"WARNING: Continuing with testing --- tests will be fully ignored, not even be counted as skipped")
+                        if args.ignore_missing_tested_file:
+                            print(f"WARNING: Continuing with testing --- tests will be fully ignored, not even be counted as skipped")
+                        else:
+                            sys.exit(-1)
                     else:
-                        sys.exit(-1)
-                else:
-                    with tested_file(args.tested_file):
-                        execute_code(os.path.basename(filename_of_tests))
+                        with tested_file(args.tested_file), context('Location', directory_containing_tests):
+                            execute_code(os.path.basename(filename_of_tests))
 
-        score = current_score()
-        counts = current_counts()
+            score = current_score()
+            counts = current_counts()
 
     print(f'PASS {counts.npass}')
     print(f'FAIL {counts.nfail}')
