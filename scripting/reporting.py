@@ -6,8 +6,11 @@ from scripting.testing import observers, skip_if
 _context = create_dynamic_variable()
 
 
+def _do_nothing():
+    pass
+
 @contextmanager
-def reporting(on_pass, on_fail, on_skip):
+def reporting(on_pass = _do_nothing, on_fail = _do_nothing, on_skip = _do_nothing):
     with observers(on_pass=on_pass, on_fail=on_fail, on_skip=on_skip):
         yield
 
