@@ -4,7 +4,7 @@ from scripting.layering import create_layering
 from collections import namedtuple
 
 
-Counts = namedtuple('Counts', ['npass', 'nfail', 'nskip'])
+Counts = namedtuple('Counts', ['npass', 'nfail', 'nskip', 'test_index'])
 
 
 @contextmanager
@@ -26,7 +26,7 @@ def keep_counts():
         nskip += 1
 
     def current_counts():
-        return Counts(npass=npass, nfail=nfail, nskip=nskip)
+        return Counts(npass=npass, nfail=nfail, nskip=nskip, test_index=npass + nfail + nskip)
 
     with observers(on_pass=on_pass, on_fail=on_fail, on_skip=on_skip):
         yield current_counts
