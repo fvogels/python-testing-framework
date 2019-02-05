@@ -22,7 +22,22 @@ def _test_command(args):
     '''
     Runs when using test command
     '''
-    with keep_score() as current_score, keep_counts() as current_counts, reporting():
+    test_index = 0
+
+    def report_pass():
+        nonlocal test_index
+        test_index += 1
+
+    def report_fail(e):
+        nonlocal test_index
+        print(f'[{test_index}] FAIL {str(e)}')
+        test_index += 1
+
+    def report_skip():
+        nonlocal test_index
+        test_index += 1
+
+    with keep_score() as current_score, keep_counts() as current_counts, reporting(on_pass=report_pass, on_fail=report_fail, on_skip=report_skip):
         for path_to_tests in find_files_recursively(predicate=has_name(args.tests_file)):
             directory_containing_tests = os.path.dirname(path_to_tests)
 

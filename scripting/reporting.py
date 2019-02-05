@@ -3,26 +3,18 @@ from scripting.dynamic import create_dynamic_variable, dynamic_bind
 from scripting.testing import observers, skip_if
 
 
-_tested_index = create_dynamic_variable()
-
-
-def _increment_index():
-    _tested_index.value += 1
+_context = create_dynamic_variable()
 
 
 @contextmanager
-def reporting():
-    def on_pass():
-        # print(f'[{_tested_index.value}] PASS')
-        _increment_index()
-
-    def on_fail(e):
-        print(f'[{_tested_index.value}] FAIL {str(e)}')
-        _increment_index()
-
-    def on_skip():
-        _increment_index()
+def reporting(on_pass, on_fail, on_skip):
+    with observers(on_pass=on_pass, on_fail=on_fail, on_skip=on_skip):
+        yield
 
 
-    with dynamic_bind(_tested_index, 0), observers(on_pass=on_pass, on_fail=on_fail, on_skip=on_skip):
+@contextmanager
+def context(key, value):
+    new_context = { **_context.value, key: value }
+
+    with dynamic_bind(_context, new_context):
         yield
