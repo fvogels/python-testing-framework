@@ -4,7 +4,30 @@ from scripting.layering import create_layering
 from collections import namedtuple
 
 
-Counts = namedtuple('Counts', ['npass', 'nfail', 'nskip', 'test_index'])
+class Counts:
+    def __init__(self, npass, nfail, nskip):
+        self.__npass = npass
+        self.__nfail = nfail
+        self.__nskip = nskip
+
+    @property
+    def test_index(self):
+        return self.__npass + self.__nfail + self.__nskip
+
+    @property
+    def npass(self):
+        return self.__npass
+
+    @property
+    def nfail(self):
+        return self.__nfail
+
+    @property
+    def nskip(self):
+        return self.__nskip
+
+    def __eq__(self, other):
+        return self.npass == other.npass and self.nfail == other.nfail and self.nskip == other.nskip
 
 
 @contextmanager
@@ -26,7 +49,7 @@ def keep_counts():
         nskip += 1
 
     def current_counts():
-        return Counts(npass=npass, nfail=nfail, nskip=nskip, test_index=npass + nfail + nskip)
+        return Counts(npass=npass, nfail=nfail, nskip=nskip)
 
     with observers(on_pass=on_pass, on_fail=on_fail, on_skip=on_skip):
         yield current_counts
