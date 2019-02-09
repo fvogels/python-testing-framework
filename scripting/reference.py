@@ -55,12 +55,12 @@ def current_active_reference_implementation():
 
 @contextmanager
 def reference_based_test(reference_implementation, tested_implementation):
-    def testcase(*args):
-        expected = call_function(reference_implementation, *args)
+    def testcase(*args, **kwargs):
+        expected = call_function(reference_implementation, *args, **kwargs)
 
         @test()
         def _():
-            actual = call_function(tested_implementation, *args)
+            actual = call_function(tested_implementation, *args, **kwargs)
 
             assert_equal_results(expected, actual)
 

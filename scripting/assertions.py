@@ -33,5 +33,10 @@ def assert_falsey(actual, **kwargs):
 def assert_equal_results(expected, actual):
     assert_equal(expected=expected.return_value, actual=actual.return_value, message=f"Expected return value is {expected.return_value}, actual is {actual.return_value}")
 
-    for expected_argument, actual_argument in zip(expected.output_arguments, actual.output_arguments):
-        assert_equal(expected=expected_argument, actual=actual_argument, message=f"Expected paremeter value is {expected_argument}, actual is {actual_argument}")
+    for index, (expected_argument, actual_argument) in enumerate(zip(expected.output_arguments, actual.output_arguments)):
+        assert_equal(expected=expected_argument, actual=actual_argument, message=f"Expected positional parameter {index+1} value is {expected_argument}, actual is {actual_argument}")
+
+    for name in expected.output_kwargs.keys():
+        expected_argument = expected.output_kwargs[name]
+        actual_argument = actual.output_kwargs[name]
+        assert_equal(expected=expected_argument, actual=actual_argument, message=f"Expected keyword parameter {name} value is {expected_argument}, actual is {actual_argument}")
