@@ -21,13 +21,15 @@ def reference_based_test(identifier):
 def regex_test(identifier):
     tested = fetch_tested_implementation(identifier)
 
-    def match(string):
+    def match(string, message=None):
         nonlocal tested
-        assert_truthy(tested(string), message=f"{id}: '{string}' should match regex")
+        message = message or f"{identifier}: '{string}' should match regex"
+        assert_truthy(tested(string), message=message)
 
-    def no_match(string):
+    def no_match(string, message=None):
         nonlocal tested
-        assert_falsey(tested(string), message=f"{id}: '{string}' should not match regex")
+        message = message or f"{identifier}: '{string}' should not match regex"
+        assert_falsey(tested(string), message=message)
 
     with skip_unless(bool(tested)):
         yield (match, no_match)
