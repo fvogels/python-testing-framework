@@ -7,7 +7,7 @@ from scripting.fileutils import find_files_recursively, has_name, execute_code, 
 from scripting.scoring import Score, keep_score
 from scripting.counting import keep_counts
 from scripting.tested import tested_file
-from scripting.reporting import reporting, format_context, context
+from scripting.reporting import reporting, context, current_context
 from scripting.testing import skip
 
 
@@ -25,7 +25,12 @@ def _test_command(args):
 
     with keep_score() as current_score, keep_counts() as current_counts:
         def report_fail(e):
-             print(f'[{current_counts().test_index}] FAIL {str(e)}\n{format_context()}=====')
+            message = "\n".join([
+                f'[{current_counts().test_index}] FAIL {str(e)}',
+                *[ f'{key}: {value}' for key, value in current_context().items() ],
+                '=' * 50,
+            ])
+            print(message.strip())
 
         with reporting(on_fail=report_fail):
             for path_to_tests in find_files_recursively(predicate=has_name(args.tests_file)):
@@ -43,7 +48,7 @@ def _test_command(args):
                         else:
                             sys.exit(-1)
                     else:
-                        with tested_file(args.tested_file), context('Location', directory_containing_tests):
+                        with tested_file(args.tested_file), context('Tests directory', directory_containing_tests):
                             execute_code(os.path.basename(filename_of_tests))
 
             score = current_score()
