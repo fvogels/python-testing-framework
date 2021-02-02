@@ -16,7 +16,7 @@ def fetch_version():
 setup(name='scripting',
       version=fetch_version(),
       description='Scripting Tools',
-      url='http://github.com/UCLeuvenLimburg/scripting',
+      url='https://github.com/ucll-scripting/scripting',
       author='Frederic Vogels',
       author_email='frederic.vogels@ucll.be',
       license='MIT',
