@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 from scripting.dynamic import create_dynamic_variable, dynamic_bind
-from scripting.testing import observers, skip_if
+from scripting.testing import observers
 
 
 @contextmanager
