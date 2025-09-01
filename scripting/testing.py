@@ -21,6 +21,7 @@ def observers(on_pass=None, on_fail=None, on_skip=None):
 
         yield
 
+
 @contextmanager
 def skip_if(condition):
     '''
