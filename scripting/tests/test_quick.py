@@ -1,6 +1,5 @@
 from unittest import TestCase
-from scripting.fileutils import load_code_from_file_into_module
-from scripting.scoring import Score, keep_score, all_or_nothing, cumulative
+from scripting.scoring import Score, keep_score
 from scripting.fileutils import load_code_from_string_into_module
 from scripting.quick import reference_based_test
 from scripting.reference import reference_module
