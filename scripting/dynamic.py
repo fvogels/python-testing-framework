@@ -23,14 +23,14 @@ class DynamicVariable:
     @property
     def value(self):
         if self.__stack:
-            return self.__stack[len(self.__stack) - 1]
+            return self.__stack[-1]
         else:
             self.__fatal_failure()
 
     @value.setter
     def value(self, value):
         if self.__stack:
-            self.__stack[len(self.__stack) - 1] = value
+            self.__stack[-1] = value
         else:
             self.__fatal_failure()
 
